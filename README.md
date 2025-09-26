@@ -1,4 +1,5 @@
 <h1 align="center">
+  <sub><sup>Forked from <a href="https://github.com/jevenchy/tempvoice">jevenchy/tempvoice</a> with fixes and updates</sup></sub>
   <br>
   <a href="https://github.com/jevenchy"><img src="img/jhinku-vc-avatar.gif" width="250" height="250" alt="Jhinku-VC"></a>
   <br>
@@ -62,15 +63,6 @@ Start the bot:
 
 ```bash
 npm start
-```
-
-## Running with Docker Compose
-
-Copy `env.example` to `.env` and edit the credentials for your bot:
-
-```bash
-cp env.example .env
-# then update .env with your Discord token and channel IDs
 ```
 
 ## File Structure
