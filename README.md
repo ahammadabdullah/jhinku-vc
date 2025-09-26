@@ -1,8 +1,8 @@
 <h1 align="center">
   <br>
-  <a href="https://github.com/jevenchy"><img src="img/bot_avatar.png" width="250" height="250" alt="TempVoice-bot"></a>
+  <a href="https://github.com/jevenchy"><img src="img/jhinku-vc-avatar.gif" width="250" height="250" alt="Jhinku-VC"></a>
   <br>
-  TempVoice-bot
+  Jhinku-VC
   <br>
 </h1>
 
@@ -12,12 +12,12 @@
   <img src="https://img.shields.io/badge/lang-JavaScript-yellow" />
   <img src="https://img.shields.io/badge/multilingual-yes-green" />
   <img src="https://img.shields.io/badge/version-v1.4.0-blue" />
-  <img src="https://img.shields.io/badge/Jevenchy-black" />
+  <img src="https://img.shields.io/badge/Ahammad Abdullah-black" />
 </p>
 
 ## Overview
 
-TempVoice is the easiest way for users to own their space.
+Jhinku-VC is the easiest way for users to own their space.
 Join once and get your own voice room — private, customizable, and temporary. Take charge in seconds: rename it, lock it down, invite who you want, and block who you don’t. No commands. No distractions.
 
 ## Features
@@ -73,19 +73,10 @@ cp env.example .env
 # then update .env with your Discord token and channel IDs
 ```
 
-Start the container:
-
-```bash
-docker compose up -d
-```
-
-Docker builds the image from the included `Dockerfile` and reads configuration
-from your `.env` file.
-
 ## File Structure
 
 ```
-tempvoice/
+Jhinku-VC/
 ├── config/                 # Global configuration
 ├── img/                    # Assets (bot avatar, demo embed)
 ├── language/               # Translations (multilingual support)
@@ -96,19 +87,3 @@ tempvoice/
     ├── handlers/           # Embed sender and interaction controller
     └── utils/              # Logger, translation function, embed builder
 ```
-
-## Customization
-
-Adjust bot behavior easily through `config/config.js`:
-
-```js
-export default {
-  language: 'en',        // Language (en, id, ru, jp, cn, de)
-  embedcode: '#2f3136',  // Default embed color
-  log: true              // Enable or disable action logging
-}
-```
-
-## Philosophy
-
-TempVoice was designed to feel native — built to blend in. No commands. No clutter. Every interaction is ephemeral, visual, and smooth. Let users manage their voice room like it's theirs — because it is.
