@@ -18,7 +18,7 @@ export default async (client, oldState, newState) => {
   if (newChannel && newChannel.id === process.env.VOICE_CHANNEL_ID) {
     try {
       const tempChannel = await newChannel.guild.channels.create({
-        name: `${member.user.username}'s Room`,
+        name: `${member.user.displayName}'s Room`,
         type: ChannelType.GuildVoice,
         parent: process.env.CATEGORY_CHANNEL_ID,
       });
