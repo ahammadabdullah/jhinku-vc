@@ -1,7 +1,5 @@
 import { ChannelType } from "discord.js";
 import { log } from "../utils/logger.js";
-import t from "../utils/t.js";
-import config from "../../config/config.js";
 
 const loggedDeleted = new Set();
 
@@ -9,53 +7,43 @@ export default async (client, oldState, newState) => {
   const oldChannel = oldState.channel;
   const newChannel = newState.channel;
   const member = newState.member || oldState.member;
-  const lang = config.language;
 
-  if (!oldChannel && newChannel) {
-    if (newChannel.id === process.env.VOICE_CHANNEL_ID) {
-      const temp = await newChannel.guild.channels.create({
-        name: `${member.user.username}'s - room`,
+  if (oldChannel && oldChannel.id !== newChannel?.id) {
+    const isTempChannel = client.tempVoiceOwners.has(oldChannel.id);
+    if (isTempChannel && oldChannel.members.size === 0) {
+      await deleteChannel(oldChannel, client);
+    }
+  }
+
+  if (newChannel && newChannel.id === process.env.VOICE_CHANNEL_ID) {
+    try {
+      const tempChannel = await newChannel.guild.channels.create({
+        name: `${member.user.username}'s Room`,
         type: ChannelType.GuildVoice,
         parent: process.env.CATEGORY_CHANNEL_ID,
       });
 
-      await newState.setChannel(temp);
-      client.tempVoiceOwners ??= new Map();
-      client.tempVoiceOwners.set(temp.id, member.id);
+      await newState.setChannel(tempChannel);
+
+      client.tempVoiceOwners.set(tempChannel.id, member.id);
 
       log("log_switched", client, {
         user: member.user.username,
         from: newChannel.name,
-        to: temp.name,
+        to: tempChannel.name,
       });
-    } else {
-      log("log_joined", client, {
+    } catch (error) {
+      console.error("Error creating temporary channel:", error);
+      log("log_channel_create_failed", client, {
         user: member.user.username,
-        channel: newChannel.name,
+        error: error.message,
       });
     }
-
-    return;
-  }
-
-  if (oldChannel && !newChannel) {
-    log("log_left", client, {
+  } else if (!oldChannel && newChannel) {
+    log("log_joined", client, {
       user: member.user.username,
-      channel: oldChannel.name,
+      channel: newChannel.name,
     });
-
-    const isOwner = client.tempVoiceOwners?.get(oldChannel.id) === member.id;
-    if (oldChannel.members.size > 0 || !isOwner) return;
-
-    await deleteChannel(oldChannel, client);
-    return;
-  }
-
-  if (oldChannel && newChannel && oldChannel.id !== newChannel.id) {
-    const isOwner = client.tempVoiceOwners?.get(oldChannel.id) === member.id;
-    if (oldChannel.members.size > 0 || !isOwner) return;
-
-    await deleteChannel(oldChannel, client);
   }
 };
 
@@ -63,29 +51,20 @@ async function deleteChannel(channel, client) {
   if (!client.channels.cache.has(channel.id)) return;
 
   try {
-    await channel.delete();
+    const channelName = channel.name;
+    await channel.delete("Temporary channel empty.");
 
-    if (
-      !client.deletedByInteraction?.has(channel.id) &&
-      !loggedDeleted.has(channel.id)
-    ) {
-      log("log_deleted", client, { channel: channel.name });
+    if (!loggedDeleted.has(channel.id)) {
+      log("log_deleted", client, { channel: channelName });
       loggedDeleted.add(channel.id);
     }
 
     client.tempVoiceOwners.delete(channel.id);
-    client.deletedByInteraction?.delete(channel.id);
+    setTimeout(() => loggedDeleted.delete(channel.id), 60000);
   } catch (err) {
-    if (err.code === 10003) {
-      if (
-        !client.deletedByInteraction?.has(channel.id) &&
-        !loggedDeleted.has(channel.id)
-      ) {
-        log("log_deleted", client, { channel: channel.name });
-        loggedDeleted.add(channel.id);
-      }
-    } else {
+    if (err.code !== 10003) {
       log("log_channel_delete_failed", client, { channel: channel.name });
+      console.error(`Failed to delete channel ${channel.name}:`, err);
     }
   }
 }

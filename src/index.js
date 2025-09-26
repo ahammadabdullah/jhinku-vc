@@ -2,7 +2,6 @@ import "dotenv/config";
 import { Client, GatewayIntentBits, Partials } from "discord.js";
 import initializeBot from "./core/initializeBot.js";
 import { logStartup } from "./utils/logger.js";
-import t from "./utils/t.js";
 
 const client = new Client({
   intents: [
